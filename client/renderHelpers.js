@@ -1,4 +1,4 @@
-import { fetchAllPlayers } from './ajaxHelpers';
+import { fetchAllPlayers, fetchSinglePlayer } from './ajaxHelpers';
 
 const playerContainer = document.getElementById('all-players-container');
 const newPlayerFormContainer = document.getElementById('new-player-form');
@@ -40,6 +40,9 @@ export const renderAllPlayers = (playerList) => {
       /*
         YOUR CODE HERE
       */
+     console.log(button.dataset.id)
+     renderSinglePlayer(await fetchSinglePlayer(button.dataset.id))
+     
     });
   }
 };
@@ -64,8 +67,18 @@ export const renderSinglePlayer = (playerObj) => {
       <button id="see-all">Back to all players</button>
     </div>
   `;
-
   playerContainer.innerHTML = pupHTML;
+  returnToHome()
+     /*function to add event listener to see all button*/
+     function returnToHome(){
+      const seeAll = document.getElementById('see-all')
+      seeAll.addEventListener('click', async function(){
+        const players = await fetchAllPlayers()
+        renderAllPlayers(players)
+
+        renderNewPlayerForm()
+      })
+     }
 };
 
 export const renderNewPlayerForm = () => {
