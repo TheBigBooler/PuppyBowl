@@ -1,4 +1,4 @@
-import { fetchAllPlayers, fetchSinglePlayer } from './ajaxHelpers';
+import { addNewPlayer, fetchAllPlayers, fetchSinglePlayer } from './ajaxHelpers';
 
 const playerContainer = document.getElementById('all-players-container');
 const newPlayerFormContainer = document.getElementById('new-player-form');
@@ -98,5 +98,22 @@ export const renderNewPlayerForm = () => {
     /*
       YOUR CODE HERE
     */
+    event.preventDefault();
+    
+    let playerData = {
+      name: form.elements.name.value,
+      breed: form.elements.breed.value
+    }
+    await addNewPlayer(playerData)
+    .then(refreshPlayers)
+    /*updates roster after adding new player*/
+    async function refreshPlayers(){
+      const players = await fetchAllPlayers();
+    renderAllPlayers(players);
+    renderNewPlayerForm();
+    }
+
   });
 };
+
+
