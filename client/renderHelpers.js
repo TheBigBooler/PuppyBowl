@@ -1,17 +1,22 @@
-import { addNewPlayer, fetchAllPlayers, fetchSinglePlayer, removePlayer } from './ajaxHelpers';
+import {
+  addNewPlayer,
+  fetchAllPlayers,
+  fetchSinglePlayer,
+  removePlayer,
+} from "./ajaxHelpers";
 
-const playerContainer = document.getElementById('all-players-container');
-const newPlayerFormContainer = document.getElementById('new-player-form');
+const playerContainer = document.getElementById("all-players-container");
+const newPlayerFormContainer = document.getElementById("new-player-form");
 
 export const renderAllPlayers = (playerList) => {
   // First check if we have any data before trying to render it!
   if (!playerList || !playerList.length) {
-    playerContainer.innerHTML = '<h3>No players to display!</h3>';
+    playerContainer.innerHTML = "<h3>No players to display!</h3>";
     return;
   }
 
   // Loop through the list of players, and construct some HTML to display each one
-  let playerContainerHTML = '';
+  let playerContainerHTML = "";
   for (let i = 0; i < playerList.length; i++) {
     const pup = playerList[i];
     let pupHTML = `
@@ -34,33 +39,36 @@ export const renderAllPlayers = (playerList) => {
   // Now that the HTML for all players has been added to the DOM,
   // we want to grab those "See details" buttons on each player
   // and attach a click handler to each one
-  let detailButtons = [...document.getElementsByClassName('detail-button')];
+  let detailButtons = [...document.getElementsByClassName("detail-button")];
   for (let i = 0; i < detailButtons.length; i++) {
     const button = detailButtons[i];
-    button.addEventListener('click', async () => {
+    button.addEventListener("click", async () => {
       /*
         YOUR CODE HERE
       */
-     console.log(button.dataset.id)
-     renderSinglePlayer(await fetchSinglePlayer(button.dataset.id))
-     
+      renderSinglePlayer(await fetchSinglePlayer(button.dataset.id));
     });
   }
-  let deleteButtons = [...document.getElementsByClassName('delete-button')];
+  let deleteButtons = [...document.getElementsByClassName("delete-button")];
   for (let i = 0; i < deleteButtons.length; i++) {
     const button = deleteButtons[i];
-    button.addEventListener('click', async () => {
-      console.log('clicked')
-      removePlayer(button.dataset.id)
-      /*refresh page after deleting a player*/
-      .then(refreshPlayers)
-    /*updates roster after adding new player*/
-    async function refreshPlayers(){
-      const players = await fetchAllPlayers();
-    renderAllPlayers(players);
-    renderNewPlayerForm();
-    }
-    })
+    button.addEventListener("click", async () => {
+      /*confirmation before deleting a player*/
+      const deleteAlert = confirm(
+        `Are you sure you want to remove player ${button.dataset.id}?`
+      );
+      if (deleteAlert) {
+        removePlayer(button.dataset.id)
+          /*refresh page after deleting a player*/
+          .then(refreshPlayers);
+        /*updates roster after adding new player*/
+        async function refreshPlayers() {
+          const players = await fetchAllPlayers();
+          renderAllPlayers(players);
+          renderNewPlayerForm();
+        }
+      }
+    });
   }
 };
 
@@ -76,7 +84,7 @@ export const renderSinglePlayer = (playerObj) => {
         <p class="pup-title">${playerObj.name}</p>
         <p class="pup-number">#${playerObj.id}</p>
       </div>
-      <p>Team: ${playerObj.team ? playerObj.team.name : 'Unassigned'}</p>
+      <p>Team: ${playerObj.team ? playerObj.team.name : "Unassigned"}</p>
       <p>Breed: ${playerObj.breed}</p>
       <img src="${playerObj.imageUrl}" alt="photo of ${
     playerObj.name
@@ -85,17 +93,20 @@ export const renderSinglePlayer = (playerObj) => {
     </div>
   `;
   playerContainer.innerHTML = pupHTML;
-  returnToHome()
-     /*function to add event listener to see all button*/
-     function returnToHome(){
-      const seeAll = document.getElementById('see-all')
-      seeAll.addEventListener('click', async function(){
-        const players = await fetchAllPlayers()
-        renderAllPlayers(players)
 
-        renderNewPlayerForm()
-      })
-     }
+  
+ 
+  /*function to add event listener to see all button*/
+  returnToHome();
+  function returnToHome() {
+    const seeAll = document.getElementById("see-all");
+    seeAll.addEventListener("click", async function () {
+      const players = await fetchAllPlayers();
+      renderAllPlayers(players);
+
+      renderNewPlayerForm();
+    });
+  }
 };
 
 export const renderNewPlayerForm = () => {
@@ -110,27 +121,24 @@ export const renderNewPlayerForm = () => {
   `;
   newPlayerFormContainer.innerHTML = formHTML;
 
-  let form = document.querySelector('#new-player-form > form');
-  form.addEventListener('submit', async (event) => {
+  let form = document.querySelector("#new-player-form > form");
+  form.addEventListener("submit", async (event) => {
     /*
       YOUR CODE HERE
     */
     event.preventDefault();
-    
+
     let playerData = {
       name: form.elements.name.value,
-      breed: form.elements.breed.value
-    }
-    await addNewPlayer(playerData)
-    .then(refreshPlayers)
+      breed: form.elements.breed.value,
+    };
+    await addNewPlayer(playerData).then(refreshPlayers);
     /*updates roster after adding new player*/
-    async function refreshPlayers(){
+    async function refreshPlayers() {
       const players = await fetchAllPlayers();
-    renderAllPlayers(players);
-    renderNewPlayerForm();
+      renderAllPlayers(players);
+      renderNewPlayerForm();
     }
-
   });
 };
-
-
+ 
